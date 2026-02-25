@@ -1,23 +1,39 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, CssBaseline } from '@mui/material';
+import Box from '@mui/material/Box';
 import theme from './theme/theme';
 import Navbar from './components/layout/Navbar';
+import BottomNav from './components/layout/BottomNav';
+import CartDrawer from './features/booking/components/CartDrawer';
+import CheckoutDialog from './features/booking/components/CheckoutDialog';
 import Hello from './features/hello/HelloPage';
-import HelloWorld from './features/hello-world/HelloWorldPage';
+import EquipmentPage from './features/equipment/EquipmentPage';
+import EquipmentDetailPage from './features/equipment/EquipmentDetailPage';
+import SupportPage from './features/support/SupportPage';
 
 function App() {
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <BrowserRouter>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Hello />} />
-          <Route path="/hello-world" element={<HelloWorld />} />
-        </Routes>
-      </BrowserRouter>
-    </ThemeProvider>
-  );
+    return (
+        <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <BrowserRouter>
+                <Navbar />
+                <Box component='main' sx={{ pb: { xs: '56px', md: 0 } }}>
+                    <Routes>
+                        <Route path='/' element={<Hello />} />
+                        <Route path='/equipment' element={<EquipmentPage />} />
+                        <Route path='/support' element={<SupportPage />} />
+                        <Route
+                            path='/equipment/:id'
+                            element={<EquipmentDetailPage />}
+                        />
+                    </Routes>
+                </Box>
+                <BottomNav />
+                <CartDrawer />
+                <CheckoutDialog />
+            </BrowserRouter>
+        </ThemeProvider>
+    );
 }
 
 export default App;
