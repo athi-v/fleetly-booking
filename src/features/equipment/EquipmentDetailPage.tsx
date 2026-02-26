@@ -8,7 +8,6 @@ import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import IconButton from '@mui/material/IconButton';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { equipment } from '../booking/data/equipment';
@@ -50,13 +49,12 @@ export default function EquipmentDetailPage() {
             <Box
                 sx={{
                     height: 10,
-                    bgcolor: item.color,
                     borderRadius: '8px 8px 0 0',
                 }}
             />
 
             <Paper
-                elevation={2}
+                elevation={0}
                 sx={{ borderRadius: '0 0 12px 12px', p: { xs: 3, md: 4 } }}
             >
                 <Box
@@ -91,8 +89,6 @@ export default function EquipmentDetailPage() {
                                 label={item.category}
                                 size='small'
                                 sx={{
-                                    bgcolor: item.color + '22',
-                                    color: item.color,
                                     fontWeight: 600,
                                     border: 'none',
                                 }}
@@ -118,11 +114,7 @@ export default function EquipmentDetailPage() {
                     </Box>
 
                     <Box sx={{ textAlign: { xs: 'left', sm: 'right' } }}>
-                        <Typography
-                            variant='h4'
-                            fontWeight={700}
-                            color='primary'
-                        >
+                        <Typography variant='h4' fontWeight={700} color='dark'>
                             R{item.dailyRate.toLocaleString()}
                         </Typography>
                         <Typography variant='body2' color='text.secondary'>
@@ -132,7 +124,26 @@ export default function EquipmentDetailPage() {
                 </Box>
 
                 <Divider sx={{ my: 3 }} />
-
+                <Box
+                    sx={{
+                        width: '100%',
+                        height: 300,
+                        overflow: 'hidden',
+                        borderRadius: 2,
+                    }}
+                >
+                    <Box
+                        component='img'
+                        src={item?.image}
+                        alt={item?.name}
+                        sx={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            display: 'block',
+                        }}
+                    />
+                </Box>
                 <Typography variant='h6' fontWeight={600} gutterBottom>
                     About
                 </Typography>
@@ -168,24 +179,8 @@ export default function EquipmentDetailPage() {
 
                 <Divider sx={{ mb: 3 }} />
 
-                {/* Hire actions */}
                 {inCart ? (
                     <Box>
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 2,
-                                mb: 3,
-                            }}
-                        >
-                            <CheckCircleIcon sx={{ color: item.color }} />
-                            <Typography fontWeight={600}>
-                                Added to your hire booking
-                            </Typography>
-                        </Box>
-
-                        {/* Units row */}
                         <Box
                             sx={{
                                 display: 'flex',
@@ -232,6 +227,7 @@ export default function EquipmentDetailPage() {
                         <Box sx={{ display: 'flex', gap: 2 }}>
                             <Button
                                 variant='contained'
+                                disableElevation
                                 size='large'
                                 onClick={openCart}
                                 sx={{ flexGrow: 1 }}
@@ -252,15 +248,12 @@ export default function EquipmentDetailPage() {
                     <Button
                         fullWidth
                         variant='contained'
+                        disableElevation
                         size='large'
                         disabled={item.stock === 0}
                         onClick={() => addItem(item)}
                         sx={{
-                            bgcolor: item.stock > 0 ? item.color : undefined,
-                            '&:hover': {
-                                bgcolor: item.color,
-                                filter: 'brightness(0.9)',
-                            },
+                            bgcolor: item.stock > 0 ? '#000' : undefined,
                         }}
                     >
                         {item.stock === 0 ? 'Unavailable' : 'Add to Hire'}

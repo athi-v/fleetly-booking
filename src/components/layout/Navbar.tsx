@@ -10,8 +10,8 @@ import EventNoteIcon from '@mui/icons-material/EventNote';
 import { useCartStore } from '../../features/booking/store/cartStore';
 
 const navLinks = [
-  { label: 'Equipment', path: '/equipment' },
-  { label: 'Support', path: '/support' },
+    { label: 'Equipment', path: '/equipment' },
+    { label: 'Support', path: '/support' },
 ];
 
 export default function Navbar() {
@@ -20,7 +20,7 @@ export default function Navbar() {
     const cartCount = totalItems();
 
     return (
-        <AppBar position='sticky' color='primary'>
+        <AppBar position='sticky' color='primary' elevation={0}>
             <Toolbar sx={{ gap: 1 }}>
                 <Typography
                     variant='h6'
@@ -47,14 +47,12 @@ export default function Navbar() {
                             key={path}
                             component={Link}
                             to={path}
-                            color='inherit'
+                            // color='inherit'
+                            variant='text'
                             sx={{
                                 fontWeight:
                                     location.pathname === path ? 700 : 400,
-                                borderBottom:
-                                    location.pathname === path
-                                        ? '2px solid white'
-                                        : '2px solid transparent',
+
                                 borderRadius: 0,
                                 pb: '2px',
                             }}

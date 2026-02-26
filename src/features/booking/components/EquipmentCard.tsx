@@ -10,7 +10,6 @@ import Chip from '@mui/material/Chip';
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import type { Equipment } from '../data/equipment';
 import { useCartStore } from '../store/cartStore';
 
@@ -35,13 +34,12 @@ export default function EquipmentCard({ equipment }: Props) {
 
     return (
         <Card
-            elevation={inCart ? 4 : 1}
+            elevation={0}
             sx={{
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                outline: inCart ? `2px solid R{equipment.color}` : 'none',
-                transition: 'box-shadow 0.2s, outline 0.2s',
+                outline: `1px solid grey`,
             }}
         >
             <CardActionArea
@@ -53,9 +51,34 @@ export default function EquipmentCard({ equipment }: Props) {
                     alignItems: 'stretch',
                 }}
             >
-                <Box sx={{ height: 8, bgcolor: equipment.color }} />
+                <Box sx={{ height: 8 }} />
 
                 <CardContent sx={{ flexGrow: 1 }}>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifySelf: 'end',
+                            gap: 1,
+                            mb: 1.5,
+                        }}
+                    >
+                        <Chip
+                            label={equipment.category}
+                            size='small'
+                            sx={{
+                                fontWeight: 600,
+                                border: 'none',
+                            }}
+                        />
+                        <Typography
+                            variant='caption'
+                            color={stockColor}
+                            fontWeight={600}
+                        >
+                            {stockText}
+                        </Typography>
+                    </Box>
                     <Box
                         sx={{
                             display: 'flex',
@@ -71,15 +94,6 @@ export default function EquipmentCard({ equipment }: Props) {
                         >
                             {equipment.name}
                         </Typography>
-                        {inCart && (
-                            <CheckCircleIcon
-                                sx={{
-                                    color: equipment.color,
-                                    fontSize: 20,
-                                    flexShrink: 0,
-                                }}
-                            />
-                        )}
                     </Box>
 
                     <Typography
@@ -89,61 +103,31 @@ export default function EquipmentCard({ equipment }: Props) {
                     >
                         {equipment.model}
                     </Typography>
-
                     <Box
                         sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 1,
-                            mb: 1.5,
+                            width: '100%',
+                            height: 200,
+                            overflow: 'hidden',
+                            borderRadius: 2,
                         }}
                     >
-                        <Chip
-                            label={equipment.category}
-                            size='small'
+                        <Box
+                            component='img'
+                            src={equipment?.image}
+                            alt={equipment?.name}
                             sx={{
-                                bgcolor: equipment.color + '22',
-                                color: equipment.color,
-                                fontWeight: 600,
-                                border: 'none',
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                display: 'block',
                             }}
                         />
-                        <Typography
-                            variant='caption'
-                            color={stockColor}
-                            fontWeight={600}
-                        >
-                            {stockText}
-                        </Typography>
                     </Box>
-
                     <Typography
-                        variant='body2'
-                        color='text.secondary'
-                        sx={{ mb: 2 }}
+                        variant='h6'
+                        // color='primary'
+                        fontWeight={700}
                     >
-                        {equipment.description}
-                    </Typography>
-
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            gap: 1,
-                            flexWrap: 'wrap',
-                            mb: 2,
-                        }}
-                    >
-                        {equipment.specs.map((s) => (
-                            <Chip
-                                key={s.label}
-                                label={`${s.label}: ${s.value}`}
-                                size='small'
-                                variant='outlined'
-                            />
-                        ))}
-                    </Box>
-
-                    <Typography variant='h6' color='primary' fontWeight={700}>
                         R{equipment.dailyRate.toLocaleString()}
                         <Typography
                             component='span'
@@ -216,17 +200,11 @@ export default function EquipmentCard({ equipment }: Props) {
                     <Button
                         fullWidth
                         variant='contained'
+                        disableElevation
                         disabled={equipment.stock === 0}
                         onClick={() => addItem(equipment)}
                         sx={{
-                            bgcolor:
-                                equipment.stock > 0
-                                    ? equipment.color
-                                    : undefined,
-                            '&:hover': {
-                                bgcolor: equipment.color,
-                                filter: 'brightness(0.9)',
-                            },
+                            bgcolor: equipment.stock > 0 ? '#000' : '',
                         }}
                     >
                         {equipment.stock === 0 ? 'Unavailable' : 'Add to Hire'}
