@@ -16,7 +16,8 @@ export default function BottomNav() {
 
     return (
         <Paper
-            elevation={3}
+            elevation={1}
+            variant='elevation'
             sx={{
                 position: 'fixed',
                 bottom: 0,
@@ -29,6 +30,10 @@ export default function BottomNav() {
             <BottomNavigation
                 value={location.pathname}
                 onChange={(_e, newPath) => navigate(newPath)}
+                sx={{
+                    '& .Mui-selected': { color: '#000' },
+                    '& .Mui-selected svg': { color: '#000' },
+                }}
             >
                 {navLinks.map(({ label, path, icon }) => (
                     <BottomNavigationAction

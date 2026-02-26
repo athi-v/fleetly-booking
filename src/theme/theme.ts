@@ -2,7 +2,7 @@ import { createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
     typography: {
-        fontFamily: '"Bricolage Grotesque", sans-serif',
+        fontFamily: '"Syne", sans-serif',
         h1: { fontWeight: 700 },
         h2: { fontWeight: 600 },
         h3: { fontWeight: 600 },
@@ -10,15 +10,15 @@ const theme = createTheme({
     },
     palette: {
         primary: {
-            main: '#1976d2',
+            main: '#fff',
             light: '#42a5f5',
-            dark: '#1565c0',
+            dark: '#000',
         },
         secondary: {
             main: '#9c27b0',
         },
         background: {
-            default: '#f5f7fa',
+            default: '#fff',
             paper: '#ffffff',
         },
     },
@@ -32,13 +32,18 @@ const theme = createTheme({
                     borderRadius: 8,
                     paddingInline: 20,
                 },
+                text: {
+                    color: '#000',
+                },
+                contained: {
+                    backgroundColor: '#000',
+                    color: '#FFF',
+                },
             },
         },
         MuiAppBar: {
             styleOverrides: {
-                root: {
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.12)',
-                },
+                root: {},
             },
         },
     },
