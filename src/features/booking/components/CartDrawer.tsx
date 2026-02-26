@@ -73,9 +73,8 @@ export default function CartDrawer() {
                             component='span'
                             onClick={closeCart}
                             sx={{
-                                color: 'primary.main',
+                                color: 'primary.dark',
                                 cursor: 'pointer',
-                                textDecoration: 'underline',
                             }}
                         >
                             Browse equipment
@@ -100,16 +99,6 @@ export default function CartDrawer() {
                                         gap: 1,
                                     }}
                                 >
-                                    <Box
-                                        sx={{
-                                            width: 10,
-                                            height: 10,
-                                            borderRadius: '50%',
-                                            bgcolor: equipment.color,
-                                            mt: 0.8,
-                                            flexShrink: 0,
-                                        }}
-                                    />
                                     <Box sx={{ flexGrow: 1 }}>
                                         <Typography fontWeight={700}>
                                             {equipment.name}
@@ -269,13 +258,14 @@ export default function CartDrawer() {
                             <Typography
                                 variant='h6'
                                 fontWeight={700}
-                                color='primary'
+                                color='dark'
                             >
                                 R{totalCost().toLocaleString()}
                             </Typography>
                         </Box>
                         <Button
                             fullWidth
+                            disableElevation
                             variant='contained'
                             size='large'
                             onClick={openCheckout}

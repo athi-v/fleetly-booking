@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Dialog from '@mui/material/Dialog';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -13,7 +13,6 @@ import TextField from '@mui/material/TextField';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Radio from '@mui/material/Radio';
-import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
 import Divider from '@mui/material/Divider';
 import Paper from '@mui/material/Paper';
@@ -61,30 +60,55 @@ const defaultContact: ContactDetails = {
     phone: '',
 };
 
+interface FormState {
+    activeStep: number;
+    booked: boolean;
+    hireDetails: Record<string, HireItemDetails>;
+    contact: ContactDetails;
+}
+
+function buildInitialForm(items: { equipment: { id: string } }[]): FormState {
+    return {
+        activeStep: 0,
+        booked: false,
+        hireDetails: Object.fromEntries(
+            items.map((i) => [
+                i.equipment.id,
+                { startDate: today, endDate: today, purpose: '' },
+            ]),
+        ),
+        contact: defaultContact,
+    };
+}
+
 export default function CheckoutDialog() {
     const { items, checkoutOpen, closeCheckout, clearCart } = useCartStore();
-    const [activeStep, setActiveStep] = useState(0);
-    const [booked, setBooked] = useState(false);
-    const [hireDetails, setHireDetails] = useState<
-        Record<string, HireItemDetails>
-    >({});
-    const [contact, setContact] = useState<ContactDetails>(defaultContact);
+    const [form, setForm] = useState<FormState>(() => buildInitialForm(items));
+    const [prevCheckoutOpen, setPrevCheckoutOpen] = useState(checkoutOpen);
 
-    useEffect(() => {
+    if (checkoutOpen !== prevCheckoutOpen) {
+        setPrevCheckoutOpen(checkoutOpen);
         if (checkoutOpen) {
-            setActiveStep(0);
-            setBooked(false);
-            setHireDetails(
-                Object.fromEntries(
-                    items.map((i) => [
-                        i.equipment.id,
-                        { startDate: today, endDate: today, purpose: '' },
-                    ]),
-                ),
-            );
-            setContact(defaultContact);
+            setForm(buildInitialForm(items));
         }
-    }, [checkoutOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+    }
+
+    const { activeStep, booked, hireDetails, contact } = form;
+
+    const setActiveStep = (fn: number | ((s: number) => number)) =>
+        setForm((prev) => ({
+            ...prev,
+            activeStep: typeof fn === 'function' ? fn(prev.activeStep) : fn,
+        }));
+    const setBooked = (value: boolean) =>
+        setForm((prev) => ({ ...prev, booked: value }));
+    const setHireDetails = (
+        fn: (
+            prev: Record<string, HireItemDetails>,
+        ) => Record<string, HireItemDetails>,
+    ) => setForm((prev) => ({ ...prev, hireDetails: fn(prev.hireDetails) }));
+    const setContact = (fn: (prev: ContactDetails) => ContactDetails) =>
+        setForm((prev) => ({ ...prev, contact: fn(prev.contact) }));
 
     const updateHire = (
         id: string,
@@ -144,7 +168,7 @@ export default function CheckoutDialog() {
                     <Paper
                         key={equipment.id}
                         variant='outlined'
-                        sx={{ p: 2.5, borderRadius: 2 }}
+                        sx={{ p: 2.5, borderRadius: 1 }}
                     >
                         <Box
                             sx={{
@@ -154,15 +178,6 @@ export default function CheckoutDialog() {
                                 mb: 2,
                             }}
                         >
-                            <Box
-                                sx={{
-                                    width: 10,
-                                    height: 10,
-                                    borderRadius: '50%',
-                                    bgcolor: equipment.color,
-                                    flexShrink: 0,
-                                }}
-                            />
                             <Typography fontWeight={700}>
                                 {equipment.name}
                             </Typography>
@@ -171,8 +186,7 @@ export default function CheckoutDialog() {
                                 size='small'
                                 sx={{
                                     ml: 'auto',
-                                    bgcolor: equipment.color + '22',
-                                    color: equipment.color,
+
                                     fontWeight: 600,
                                     border: 'none',
                                 }}
@@ -249,10 +263,24 @@ export default function CheckoutDialog() {
         </Box>
     );
 
+    const greyFieldSx = {
+        '& .MuiOutlinedInput-root': {
+            bgcolor: 'grey.100',
+            '& fieldset': { borderColor: 'grey.300' },
+            '&:hover fieldset': { borderColor: 'grey.400' },
+        },
+        '& .MuiInputLabel-root': { color: 'grey.600' },
+    };
+
+    const greyRadioSx = {
+        color: 'grey.500',
+        '&.Mui-checked': { color: 'grey.700' },
+    };
+
     const renderContactDetails = () => (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
             <FormControl>
-                <FormLabel>Booking type</FormLabel>
+                <Typography sx={{ color: 'grey.600' }}>Booking type</Typography>
                 <RadioGroup
                     row
                     value={contact.type}
@@ -265,12 +293,12 @@ export default function CheckoutDialog() {
                 >
                     <FormControlLabel
                         value='company'
-                        control={<Radio />}
+                        control={<Radio sx={greyRadioSx} />}
                         label='Company'
                     />
                     <FormControlLabel
                         value='individual'
-                        control={<Radio />}
+                        control={<Radio sx={greyRadioSx} />}
                         label='Individual'
                     />
                 </RadioGroup>
@@ -287,6 +315,7 @@ export default function CheckoutDialog() {
                 onChange={(e) =>
                     setContact((prev) => ({ ...prev, name: e.target.value }))
                 }
+                sx={greyFieldSx}
             />
             {contact.type === 'company' && (
                 <>
@@ -301,6 +330,7 @@ export default function CheckoutDialog() {
                                 contactPerson: e.target.value,
                             }))
                         }
+                        sx={greyFieldSx}
                     />
                     <TextField
                         label='ABN (optional)'
@@ -313,6 +343,7 @@ export default function CheckoutDialog() {
                                 abn: e.target.value,
                             }))
                         }
+                        sx={greyFieldSx}
                     />
                 </>
             )}
@@ -326,6 +357,7 @@ export default function CheckoutDialog() {
                 onChange={(e) =>
                     setContact((prev) => ({ ...prev, email: e.target.value }))
                 }
+                sx={greyFieldSx}
             />
             <TextField
                 label='Phone'
@@ -337,6 +369,7 @@ export default function CheckoutDialog() {
                 onChange={(e) =>
                     setContact((prev) => ({ ...prev, phone: e.target.value }))
                 }
+                sx={greyFieldSx}
             />
         </Box>
     );
@@ -373,15 +406,6 @@ export default function CheckoutDialog() {
                                             mb: 0.5,
                                         }}
                                     >
-                                        <Box
-                                            sx={{
-                                                width: 8,
-                                                height: 8,
-                                                borderRadius: '50%',
-                                                bgcolor: equipment.color,
-                                                flexShrink: 0,
-                                            }}
-                                        />
                                         <Typography fontWeight={700}>
                                             {equipment.name}
                                         </Typography>
@@ -458,14 +482,13 @@ export default function CheckoutDialog() {
                 <Typography variant='h6' fontWeight={700}>
                     Estimated Total
                 </Typography>
-                <Typography variant='h5' fontWeight={700} color='primary'>
+                <Typography variant='h5' fontWeight={700} color='dark'>
                     R{grandTotal.toLocaleString()}
                 </Typography>
             </Box>
         </Box>
     );
 
-    // ── Success ───────────────────────────────────────────────────────
     const renderSuccess = () => (
         <Box sx={{ textAlign: 'center', py: 8 }}>
             <CheckCircleIcon
@@ -481,7 +504,12 @@ export default function CheckoutDialog() {
                 Your hire request has been received. We'll be in touch shortly
                 to confirm.
             </Typography>
-            <Button variant='contained' size='large' onClick={handleClose}>
+            <Button
+                variant='contained'
+                size='medium'
+                onClick={handleClose}
+                disableElevation
+            >
                 Done
             </Button>
         </Box>
@@ -496,7 +524,7 @@ export default function CheckoutDialog() {
             fullScreen
             PaperProps={{ sx: { bgcolor: 'background.default' } }}
         >
-            <AppBar position='sticky' color='inherit' elevation={1}>
+            <AppBar position='sticky' color='inherit' elevation={0}>
                 <Toolbar>
                     <IconButton
                         edge='start'
@@ -514,7 +542,21 @@ export default function CheckoutDialog() {
                         <Stepper activeStep={activeStep} alternativeLabel>
                             {STEP_LABELS.map((label) => (
                                 <Step key={label}>
-                                    <StepLabel>{label}</StepLabel>
+                                    <StepLabel
+                                        StepIconProps={{
+                                            sx: {
+                                                color: 'grey.400',
+                                                '&.Mui-active': {
+                                                    color: 'grey.100',
+                                                },
+                                                '&.Mui-completed': {
+                                                    color: 'grey.800',
+                                                },
+                                            },
+                                        }}
+                                    >
+                                        {label}
+                                    </StepLabel>
                                 </Step>
                             ))}
                         </Stepper>
@@ -543,7 +585,7 @@ export default function CheckoutDialog() {
                     }}
                 >
                     <Button
-                        variant='outlined'
+                        variant='text'
                         onClick={() => setActiveStep((s) => s - 1)}
                         disabled={activeStep === 0}
                         sx={{ minWidth: 88 }}
@@ -553,6 +595,7 @@ export default function CheckoutDialog() {
                     {activeStep < STEP_LABELS.length - 1 ? (
                         <Button
                             variant='contained'
+                            disableElevation
                             onClick={() => setActiveStep((s) => s + 1)}
                             disabled={!canNext}
                             sx={{ flexGrow: 1 }}
@@ -561,6 +604,7 @@ export default function CheckoutDialog() {
                         </Button>
                     ) : (
                         <Button
+                            disableElevation
                             variant='contained'
                             color='success'
                             onClick={() => setBooked(true)}
